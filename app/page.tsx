@@ -3,19 +3,24 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
+// Definisikan tipe Task
+type Task = {
+  id: number;
+  title: string;
+  desc: string;
+  done: boolean;
+};
+
 export default function Home() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
-  const [editId, setEditId] = useState(null);
+  const [editId, setEditId] = useState<number | null>(null);
 
-  // Load data awal (tasks)
+  // Load data awal
   useEffect(() => {
     const saved = localStorage.getItem("tasks");
     if (saved) setTasks(JSON.parse(saved));
-
-    // Set dark mode permanen
-    document.documentElement.classList.add("dark");
   }, []);
 
   // Simpan tasks setiap ada perubahan
@@ -31,7 +36,7 @@ export default function Home() {
 
   const addTask = () => {
     if (!title.trim()) {
-      Swal.fire("Whopp", "Tugas gaboleh kosong ya...", "error");
+      Swal.fire("Oops!", "Judul tugas tidak boleh kosong!", "error");
       return;
     }
 
@@ -41,19 +46,19 @@ export default function Home() {
           t.id === editId ? { ...t, title, desc } : t
         )
       );
-      Swal.fire("Working cuy!", "Tugas berhasil diupdate", "success");
+      Swal.fire("Berhasil!", "Tugas berhasil diupdate", "success");
     } else {
       setTasks([
         ...tasks,
         { id: Date.now(), title, desc, done: false },
       ]);
-      Swal.fire("Mantap!", "Tugas berhasil ditambahkan", "success");
+      Swal.fire("Berhasil!", "Tugas berhasil ditambahkan", "success");
     }
 
     resetForm();
   };
 
-  const toggleTask = (id) => {
+  const toggleTask = (id: number) => {
     setTasks(
       tasks.map((t) =>
         t.id === id ? { ...t, done: !t.done } : t
@@ -61,13 +66,13 @@ export default function Home() {
     );
   };
 
-  const deleteTask = (id) => {
+  const deleteTask = (id: number) => {
     Swal.fire({
-      title: "Mau hapus tugas ini?",
-      text: "Tindakan ini tidak bisa dibatalkan yah",
+      title: "Hapus tugas ini?",
+      text: "Tindakan ini tidak bisa dibatalkan",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Iya hapus aja",
+      confirmButtonText: "Ya, hapus",
       cancelButtonText: "Batal",
     }).then((result) => {
       if (result.isConfirmed) {
@@ -77,15 +82,15 @@ export default function Home() {
     });
   };
 
-  const editTask = (task) => {
+  const editTask = (task: Task) => {
     setTitle(task.title);
     setDesc(task.desc);
     setEditId(task.id);
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center p-6">
-      <div className="bg-gray-900 text-gray-100 shadow-xl rounded-2xl p-8 w-full max-w-2xl flex flex-col">
+    <main className="min-h-screen bg-gray-900 flex flex-col items-center p-6 text-gray-100">
+      <div className="bg-gray-800 shadow-xl rounded-2xl p-8 w-full max-w-2xl relative">
         <h1 className="text-4xl font-extrabold text-center mb-8 text-green-400">
           To‑Do List
         </h1>
@@ -97,13 +102,13 @@ export default function Home() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Judul tugas..."
-            className="border border-gray-700 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-800"
+            className="border border-green-700 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-700 text-white"
           />
           <textarea
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
             placeholder="Deskripsi tugas..."
-            className="border border-gray-700 rounded-xl px-4 py-2 h-24 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-800 resize-none"
+            className="border border-green-700 rounded-xl px-4 py-2 h-24 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-700 text-white resize-none"
           />
           <div className="flex gap-2">
             <button
@@ -115,7 +120,7 @@ export default function Home() {
             {editId && (
               <button
                 onClick={resetForm}
-                className="bg-gray-700 hover:bg-gray-600 text-gray-200 px-5 py-2 rounded-xl font-medium transition"
+                className="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-xl font-medium transition"
               >
                 Batal
               </button>
@@ -124,7 +129,7 @@ export default function Home() {
         </div>
 
         {/* Daftar Tugas */}
-        <ul className="space-y-4 flex-1">
+        <ul className="space-y-4">
           {tasks.length === 0 && (
             <li className="text-center text-gray-400">
               Belum ada tugas
@@ -133,7 +138,7 @@ export default function Home() {
           {tasks.map((t) => (
             <li
               key={t.id}
-              className="bg-gray-800 hover:bg-gray-700 p-5 rounded-xl shadow-sm transition"
+              className="bg-gray-700 hover:bg-gray-600 p-5 rounded-xl shadow-sm transition"
             >
               <div className="flex justify-between items-start">
                 <div
@@ -143,7 +148,7 @@ export default function Home() {
                   <p
                     className={`font-semibold text-lg ${
                       t.done
-                        ? "line-through text-gray-500"
+                        ? "line-through text-gray-400"
                         : "text-green-300"
                     }`}
                   >
@@ -153,8 +158,8 @@ export default function Home() {
                     <p
                       className={`mt-1 text-sm ${
                         t.done
-                          ? "line-through text-gray-500"
-                          : "text-green-400"
+                          ? "line-through text-gray-400"
+                          : "text-green-200"
                       }`}
                     >
                       {t.desc}
@@ -164,7 +169,7 @@ export default function Home() {
                 <div className="flex gap-2 ml-4">
                   <button
                     onClick={() => editTask(t)}
-                    className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded-lg transition"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg transition"
                   >
                     Edit
                   </button>
@@ -181,8 +186,8 @@ export default function Home() {
         </ul>
 
         {/* Footer */}
-        <footer className="mt-10 pt-6 border-t border-gray-700 text-center text-sm text-gray-400">
-          © {new Date().getFullYear()} To‑Do List App. Dapinskuyy.
+        <footer className="mt-10 text-center text-gray-400 text-sm">
+          &copy; {new Date().getFullYear()} Todo App by Davina
         </footer>
       </div>
     </main>
