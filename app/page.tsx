@@ -67,20 +67,21 @@ export default function Home() {
   };
 
   const deleteTask = (id: number) => {
-    Swal.fire({
-      title: "Hapus tugas ini?",
-      text: "Tindakan ini tidak bisa dibatalkan",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Ya, hapus",
-      cancelButtonText: "Batal",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setTasks(tasks.filter((t) => t.id !== id));
-        Swal.fire("Terhapus!", "Tugas berhasil dihapus", "success");
-      }
-    });
-  };
+  Swal.fire({
+    title: "Hapus tugas ini?",
+    text: "Tindakan ini tidak bisa dibatalkan",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Ya, hapus",
+    cancelButtonText: "Batal",
+  }).then((result: { isConfirmed: boolean }) => {
+    if (result.isConfirmed) {
+      setTasks(tasks.filter((t) => t.id !== id));
+      Swal.fire("Terhapus!", "Tugas berhasil dihapus", "success");
+    }
+  });
+};
+
 
   const editTask = (task: Task) => {
     setTitle(task.title);
